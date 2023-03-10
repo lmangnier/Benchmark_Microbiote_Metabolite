@@ -163,26 +163,39 @@ summary(jaccard.associations.Scenario3_beta_0.25)
 #Here we use ZINB approach:
 library(pscl)
 
-
 zinb.Scenario3_beta_neg0.5 = list()
 zinb.Scenario3_beta_neg0.25 = list()
 zinb.Scenario3_beta_0.25 = list()
 zinb.Scenario3_beta_0.5 = list()
 zinb.Scenario3_beta_mixed = list()
 
-for(r in 1:100){
+for(r in 1:1000){
   print(r)
-  p.all = c()
+  l = list()
   for(j in 1:25){
     
     p = c()
     for(i in 1:25){
       
-      m = summary(zeroinfl(list.scenarios.dense.Metabolites$`Scenario_3_beta_-0.25`[[r]][,j]~list.scenarios.dense.Microbiotes$`Scenario_3_beta_-0.25`[[r]][,i], dist="negbin"))
+      m = summary(zeroinfl(list.scenarios.dense.Metabolites$Scenario_3_beta_0.25[[r]][,j]~list.scenarios.dense.Microbiotes$Scenario_3_beta_0.25[[r]][,i], dist="negbin"))
       p = c(p,m$coefficients$count[2,4])
     }
+    l[[j]] = p
+    zinb.Scenario3_beta_0.25[[r]] = l
     
-    p.all = c(p.all,ACAT::ACAT(p[!is.na(p)]))
   }
-  l.r[[r]] = p.all
+  
 }
+
+
+library(mpath)
+list.scenarios.dense.index$Scenario_3_beta_0.5[[1]]
+Xy = data.frame(cbind(list.scenarios.dense.Metabolites$Scenario_3_beta_0.5[[1]][,1], list.scenarios.dense.Microbiotes$Scenario_3_beta_0.5[[1]]))
+
+
+fit.lasso = mpath::zipath(X1~.|.,data=Xy,family = "negbin", nlambda=100,
+              lambda.zero.min.ratio=0.001, maxit.em=300, maxit.theta=25,
+              theta.fixed=FALSE, trace=FALSE, penalty="enet", rescale=FALSE)
+
+minBic = which.min(BIC(fit.lasso))
+coef(fit.lasso, minBic)

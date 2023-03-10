@@ -1,5 +1,5 @@
 #Util functions
-
+#Univariate methods
 compute.pairwise.spearman = function(X,Y){
   
   ncol.X = ncol(X)
@@ -119,4 +119,49 @@ compute.auc = function(pvalues,true.associated){
   
   ert = as.numeric(ert%in%true.associated)
   auc(roc(ert,pvalues))
+}
+
+#Lasso-ZINB 
+
+
+#CCA
+
+#This function returns different types of redundancy from a CCA object
+compute.redundancy.cca = function(X,Y,cca.object){
+  
+  #Proportion of variance by each variate
+  variance.explained.X = colSums(cca.object$scores$corr.X.xscores^2)/ncol(X)
+  variance.explained.Y = colSums(cca.object$scores$corr.Y.yscores^2)/ncol(Y)
+  
+  #Proportion of variance in the first pair explained by other member of the pair
+  proportion.variance.canonical.cor = cca.object$cor^2
+  
+  #Proportion of X explained by the canonical variates 
+  cond.redundancy.X = variance.explained.X*proportion.variance.canonical.cor
+  cond.redundancy.Y = variance.explained.Y*proportion.variance.canonical.cor
+  
+  
+  return(list("Redundancy" = list("X"=variance.explained.X, "Y"=variance.explained.Y),"VarianceCanonicalCor" = proportion.variance.canonical.cor,"ConditionalRedundancy" = list("X" = cond.redundancy.X, "Y"=cond.redundancy.Y)))
+}
+
+
+#PLS
+compute.redundancy.pls = function(X,Y,pls.object){
+  
+  
+  X.scaled = apply(X, 2, function(col) (col-mean(col))/sd(col))
+  Y.scaled = apply(Y, 2, function(col) (col-mean(col))/sd(col))
+  
+  #Proportion of variance by each variate
+  variance.explained.X = sapply(1:ncol(X), function(y) sum(sapply(1:ncol(X), function(x) cor(X.scaled[,x], pls.object$variates$X[,y])^2))/ncol(X))
+  variance.explained.Y = sapply(1:ncol(Y), function(y) sum(sapply(1:ncol(Y), function(x) cor(Y.scaled[,x], pls.object$variates$Y[,y])^2))/ncol(Y))
+  
+  #Proportion of variance in the first pair explained by other member of the pair
+  proportion.variance.canonical.cor = sapply(1:ncol(X), function(x) cor(pls.object$variates$X[,x], pls.object$variates$Y[,x])^2)
+  
+  #Proportion of variance explained by the canonical variates
+  cond.redundancy.X = variance.explained.X * proportion.variance.canonical.cor
+  cond.redundancy.Y = variance.explained.Y * proportion.variance.canonical.cor
+  
+  return(list("Redundancy" = list("X"=variance.explained.X, "Y"=variance.explained.Y),"VarianceCanonicalCor" = proportion.variance.canonical.cor,"ConditionalRedundancy" = list("X" = cond.redundancy.X, "Y"=cond.redundancy.Y)))
 }
