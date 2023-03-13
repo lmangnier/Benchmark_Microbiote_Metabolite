@@ -98,11 +98,9 @@ boxplot(conditional.redundancy.X.Scenario_1_beta_0.25,conditional.redundancy.X.S
         conditional.redundancy.X.Scenario_10_beta_0.25)
 
 boxplot(conditional.redundancy.Y.Scenario_1_beta_0.25,conditional.redundancy.Y.Scenario_3_beta_0.25,
-        conditional.redundancy.Y.Scenario_10_beta_0.25)
+        conditional.redundancy.Y.Scenario_10_beta_0.25, ylim=c(0,1))
 
-#PLS
-
-
+#PLS: regression
 
 pls.regression.Scenario_3_beta_0.25 = lapply(1:1000, function(rep){
   mixOmics::pls(list.scenarios.dense.Microbiotes$Scenario_3_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_3_beta_0.25[[rep]], ncomp=25, mode="regression")
@@ -116,5 +114,57 @@ pls.regression.Scenario_10_beta_0.25 = lapply(1:1000, function(rep){
   mixOmics::pls(list.scenarios.dense.Microbiotes$Scenario_10_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_10_beta_0.25[[rep]], ncomp=25, mode="regression")
 })
 
-#RDA
+#PLS: canonical
 
+pls.canonical.Scenario_3_beta_0.25 = lapply(1:1000, function(rep){
+  mixOmics::pls(list.scenarios.dense.Microbiotes$Scenario_3_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_3_beta_0.25[[rep]], ncomp=25, mode="canonical")
+})
+
+pls.canonical.Scenario_1_beta_0.25 = lapply(1:1000, function(rep){
+  mixOmics::pls(list.scenarios.dense.Microbiotes$Scenario_1_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_1_beta_0.25[[rep]], ncomp=25, mode="canonical")
+})
+
+pls.canonical.Scenario_10_beta_0.25 = lapply(1:1000, function(rep){
+  mixOmics::pls(list.scenarios.dense.Microbiotes$Scenario_10_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_10_beta_0.25[[rep]], ncomp=25, mode="canonical")
+})
+
+#redundancy for PLS
+redundancy.pls.Scenario3_beta_0.25 = lapply(1:1000, function(rep) {
+  compute.redundancy.pls(list.scenarios.dense.Microbiotes$Scenario_3_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_3_beta_0.25[[rep]],pls.regression.Scenario_3_beta_0.25[[rep]])
+})
+
+redundancy.pls.Scenario1_beta_0.25 = lapply(1:1000, function(rep) {
+  compute.redundancy.pls(list.scenarios.dense.Microbiotes$Scenario_1_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_1_beta_0.25[[rep]],pls.regression.Scenario_1_beta_0.25[[rep]])
+})
+
+redundancy.pls.Scenario10_beta_0.25 = lapply(1:1000, function(rep) {
+  compute.redundancy.pls(list.scenarios.dense.Microbiotes$Scenario_10_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_10_beta_0.25[[rep]],pls.regression.Scenario_10_beta_0.25[[rep]])
+})
+
+
+conditional.redundancy.pls.X.Scenario_1_beta_0.25 = sapply(redundancy.pls.Scenario1_beta_0.25, function(x) sum(x$ConditionalRedundancy$X))
+conditional.redundancy.pls.X.Scenario_3_beta_0.25 = sapply(redundancy.pls.Scenario3_beta_0.25, function(x) sum(x$ConditionalRedundancy$X))
+conditional.redundancy.pls.X.Scenario_10_beta_0.25 = sapply(redundancy.pls.Scenario10_beta_0.25, function(x) sum(x$ConditionalRedundancy$X))
+
+conditional.redundancy.pls.Y.Scenario_1_beta_0.25 = sapply(redundancy.pls.Scenario1_beta_0.25, function(x) sum(x$ConditionalRedundancy$Y))
+conditional.redundancy.pls.Y.Scenario_3_beta_0.25 = sapply(redundancy.pls.Scenario3_beta_0.25, function(x) sum(x$ConditionalRedundancy$Y))
+conditional.redundancy.pls.Y.Scenario_10_beta_0.25 = sapply(redundancy.pls.Scenario10_beta_0.25, function(x) sum(x$ConditionalRedundancy$Y))
+
+
+boxplot(conditional.redundancy.pls.X.Scenario_1_beta_0.25,conditional.redundancy.pls.X.Scenario_3_beta_0.25,
+        conditional.redundancy.pls.X.Scenario_10_beta_0.25)
+
+boxplot(conditional.redundancy.pls.Y.Scenario_1_beta_0.25,conditional.redundancy.pls.Y.Scenario_3_beta_0.25,
+        conditional.redundancy.pls.Y.Scenario_10_beta_0.25, ylim=c(0,1))
+
+
+#RDA
+rda.Scenario_1_beta_0.25 = lapply(1:1000, function(rep){
+  vegan::rda(list.scenarios.dense.Microbiotes$Scenario_1_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_1_beta_0.25[[rep]])
+})
+rda.Scenario_1_beta_0.25 = lapply(1:1000, function(rep){
+  vegan::rda(list.scenarios.dense.Microbiotes$Scenario_3_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_3_beta_0.25[[rep]])
+})
+rda.Scenario_10_beta_0.25 = lapply(1:1000, function(rep){
+  vegan::rda(list.scenarios.dense.Microbiotes$Scenario_10_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_10_beta_0.25[[rep]])
+})
