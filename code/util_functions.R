@@ -227,3 +227,66 @@ compute.redundancy.pls = function(X,Y,pls.object){
   
   return(list("Redundancy" = list("X"=variance.explained.X, "Y"=variance.explained.Y),"VarianceCanonicalCor" = proportion.variance.canonical.cor,"ConditionalRedundancy" = list("X" = cond.redundancy.X, "Y"=cond.redundancy.Y)))
 }
+
+#This function computes the Jaccard index for a cca object
+#' @param cca.object a pls object returned by CCA::cc
+#' @param index.true.associated a vector of index for true associations
+#' @return the Jaccard index 
+
+compute.jaccard.cca = function(cca.object, index.true.associated, type=c("X","Y") ,index.component = 1:2){
+  
+  keep = length(index.true.associated)
+  
+  if(type=="X"){
+    order.index.by.component = lapply(index.component, function(n){
+      order(abs(cca.object$scores$corr.X.xscores[,n]),decreasing = T)[1:keep]})
+  }
+  
+  else if(type=="Y"){
+    order.index.by.component = lapply(index.component, function(n){
+      order(abs(cca.object$scores$corr.Y.yscores[,n]),decreasing = T)[1:keep]})
+  }
+  
+  sapply(order.index.by.component, function(x) {
+    sum(x%in%index.true.associated)/
+      (length(x)+length(index.true.associated)-sum(x%in%index.true.associated))
+  })
+}
+
+
+#This function computes the Jaccard index for a pls object
+#' @param pls.object a pls object returned by mixOmics::pls
+#' @param index.true.associated a vector of index for true associations
+#' @return the Jaccard index 
+
+compute.jaccard.pls = function(pls.object, index.true.associated, type=c("X","Y") ,index.component = 1:2){
+  
+  keep = length(index.true.associated)
+  
+  if(type=="X"){
+    order.index.by.component = lapply(index.component, function(n){
+      order(abs(pls.object$loadings$X[,n]),decreasing = T)[1:keep]})
+  }
+  
+  else if(type=="Y"){
+    order.index.by.component = lapply(index.component, function(n){
+      order(abs(pls.object$loadings$Y[,n]),decreasing = T)[1:keep]})
+  }
+  
+  sapply(order.index.by.component, function(x) {
+    sum(x%in%index.true.associated)/
+    (length(x)+length(index.true.associated)-sum(x%in%index.true.associated))
+  })
+}
+
+
+#RDA
+
+#This function computes the proportion of explained variance from Redundancy analysis
+#'@param rda.object a rda object from vegan rda function
+#'@return the proportion of explained variance 
+#'
+compute.explained.variance.rda = function(rda.object){
+  
+  return(rda.object$CCA$tot.chi/ rda.object$tot.chi)
+}

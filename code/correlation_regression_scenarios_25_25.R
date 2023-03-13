@@ -1,5 +1,5 @@
 #Code to assess Correlation and Regression-based approaches for scenarios 25-25 
-
+library(mpath)
 load("util_functions.R")
 
 #Correlation approaches:
@@ -187,15 +187,18 @@ for(r in 1:1000){
   
 }
 
+#LASSO-ZINB
+list.results.lasso.Scenario_3_beta_0.25 = list()
 
-library(mpath)
-list.scenarios.dense.index$Scenario_3_beta_0.5[[1]]
-Xy = data.frame(cbind(list.scenarios.dense.Metabolites$Scenario_3_beta_0.5[[1]][,1], list.scenarios.dense.Microbiotes$Scenario_3_beta_0.5[[1]]))
+for(y in 1:25){
+  Xy = data.frame(cbind(list.scenarios.dense.Metabolites$Scenario_3_beta_0.25[[1]][,y], list.scenarios.dense.Microbiotes$Scenario_3_beta_0.25[[1]]))
+  
+  
+  fit.lasso = mpath::zipath(X1~.|.,data=Xy,family = "negbin", nlambda=100,
+                            lambda.zero.min.ratio=0.001, maxit.em=300, maxit.theta=25,
+                            theta.fixed=FALSE, trace=FALSE, penalty="enet", rescale=FALSE)
+  
+  minBic = which.min(BIC(fit.lasso))
+  list.results.lasso.Scenario_3_beta_0.25[[y]] = coef(fit.lasso, minBic)
+}
 
-
-fit.lasso = mpath::zipath(X1~.|.,data=Xy,family = "negbin", nlambda=100,
-              lambda.zero.min.ratio=0.001, maxit.em=300, maxit.theta=25,
-              theta.fixed=FALSE, trace=FALSE, penalty="enet", rescale=FALSE)
-
-minBic = which.min(BIC(fit.lasso))
-coef(fit.lasso, minBic)

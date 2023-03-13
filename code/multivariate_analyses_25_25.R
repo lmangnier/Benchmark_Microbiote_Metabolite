@@ -162,9 +162,33 @@ boxplot(conditional.redundancy.pls.Y.Scenario_1_beta_0.25,conditional.redundancy
 rda.Scenario_1_beta_0.25 = lapply(1:1000, function(rep){
   vegan::rda(list.scenarios.dense.Microbiotes$Scenario_1_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_1_beta_0.25[[rep]])
 })
-rda.Scenario_1_beta_0.25 = lapply(1:1000, function(rep){
+rda.Scenario_3_beta_0.25 = lapply(1:1000, function(rep){
   vegan::rda(list.scenarios.dense.Microbiotes$Scenario_3_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_3_beta_0.25[[rep]])
 })
 rda.Scenario_10_beta_0.25 = lapply(1:1000, function(rep){
   vegan::rda(list.scenarios.dense.Microbiotes$Scenario_10_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_10_beta_0.25[[rep]])
 })
+
+boxplot(sapply(1:1000, function(rep) compute.explained.variance.rda(rda.Scenario_1_beta_0.25[[rep]])),
+sapply(1:1000, function(rep) compute.explained.variance.rda(rda.Scenario_3_beta_0.25[[rep]])),
+sapply(1:1000, function(rep) compute.explained.variance.rda(rda.Scenario_10_beta_0.25[[rep]])), ylim=c(0,1))
+
+
+
+trw.X = sapply(1:1000, function(rep) {
+  compute.jaccard.pls(pls.regression.Scenario_10_beta_0.25[[rep]],
+                    list.scenarios.dense.index$Scenario_10_beta_0.25[[rep]]$Microbiotes, type="X", index.component=1:25)})
+
+trw.Y = sapply(1:1000, function(rep) {
+  compute.jaccard.pls(pls.regression.Scenario_10_beta_0.25[[rep]],
+                      list.scenarios.dense.index$Scenario_10_beta_0.25[[rep]]$Metabolites, type="Y", index.component=1:25)})
+
+boxplot(t(trw.X), ylim=c(0,1))
+boxplot(t(trw.Y), ylim=c(0,1))
+
+
+dft = sapply(1:1000, function(rep) compute.jaccard.cca(cca.Scenario_10_beta_0.25[[rep]],list.scenarios.dense.index$Scenario_10_beta_0.25[[rep]]$Microbiotes, type="X", index.component=1:25))
+boxplot(t(dft))
+
+dft.y = sapply(1:1000, function(rep) compute.jaccard.cca(cca.Scenario_10_beta_0.25[[rep]],list.scenarios.dense.index$Scenario_10_beta_0.25[[rep]]$Metabolites, type="Y", index.component=1:25))
+boxplot(t(dft.y))
