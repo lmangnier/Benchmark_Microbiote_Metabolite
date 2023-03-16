@@ -155,9 +155,10 @@ build.ROC = function(pvalues, true.associated, true.non.associated, signi.levels
     sensivity.specificity.from.confusion.matrix(x)
   })
   
-  plot(1-specificity.sensitivity.for.all.confusion.matrix[2,],specificity.sensitivity.for.all.confusion.matrix[1,], xlab="1-Specificity", ylab="Sensitivity")
+  plot(1-specificity.sensitivity.for.all.confusion.matrix[2,],specificity.sensitivity.for.all.confusion.matrix[1,], xlab="1-Specificity", ylab="Sensitivity", main="ROC Curve")
   lines(1-specificity.sensitivity.for.all.confusion.matrix[2,],specificity.sensitivity.for.all.confusion.matrix[1,], lwd=2)
   abline(0,1, lty=2, lwd=2)
+  text(0.8,0.1, paste0("AUC=", round(compute.auc(pvalues, true.associated),2)))
 }
 
 #This function computes the area under the curve

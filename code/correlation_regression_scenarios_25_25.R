@@ -1,5 +1,7 @@
 #Code to assess Correlation and Regression-based approaches for scenarios 25-25 
 library(mpath)
+par(mar=rep(4,4))
+
 load("util_functions.R")
 
 #Correlation approaches:
@@ -33,35 +35,32 @@ spearman.cor.Scenario_3_beta_mixed = lapply(1:1000, function(rep) {
 #Jaccard Index
 jaccard.Scenario3_beta_neg0.5 = sapply(1:1000, function(rep) {
   compute.jaccard(ACAT.by.element(spearman.cor.Scenario_3_beta_neg0.5[[rep]], list.scenarios.dense.Microbiotes$`Scenario_3_beta_-0.5`[[rep]],list.scenarios.dense.Metabolites$`Scenario_3_beta_-0.5`[[rep]]),
-                  list.scenarios.dense.index$`Scenario_3_beta_-0.5`[[rep]]$Microbiotes)
+                  list.scenarios.dense.index$`Scenario_3_beta_-0.5`[[rep]]$Microbiotes,0.05/25)
 })
 
 jaccard.Scenario3_beta_neg0.25 = sapply(1:1000, function(rep) {
   compute.jaccard(ACAT.by.element(spearman.cor.Scenario_3_beta_neg0.25[[rep]], list.scenarios.dense.Microbiotes$`Scenario_3_beta_-0.25`[[rep]],list.scenarios.dense.Metabolites$`Scenario_3_beta_-0.25`[[rep]]),
-                  list.scenarios.dense.index$`Scenario_3_beta_-0.25`[[rep]]$Microbiotes)
+                  list.scenarios.dense.index$`Scenario_3_beta_-0.25`[[rep]]$Microbiotes,0.05/25)
 })
 
 jaccard.Scenario3_beta_0.25 = sapply(1:1000, function(rep) {
   compute.jaccard(ACAT.by.element(spearman.cor.Scenario_3_beta_0.25[[rep]], list.scenarios.dense.Microbiotes$Scenario_3_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_3_beta_0.25[[rep]]),
-                  list.scenarios.dense.index$Scenario_3_beta_0.25[[rep]]$Microbiotes)
+                  list.scenarios.dense.index$Scenario_3_beta_0.25[[rep]]$Microbiotes,0.05/25)
 })
 
 jaccard.Scenario3_beta_0.5 = sapply(1:1000, function(rep) {
   compute.jaccard(ACAT.by.element(spearman.cor.Scenario_3_beta_0.5[[rep]], list.scenarios.dense.Microbiotes$Scenario_3_beta_0.5[[rep]],list.scenarios.dense.Metabolites$Scenario_3_beta_0.5[[rep]]),
-                list.scenarios.dense.index$Scenario_3_beta_0.5[[rep]]$Microbiotes)
+                list.scenarios.dense.index$Scenario_3_beta_0.5[[rep]]$Microbiotes,0.05/25)
   })
 
 
 jaccard.Scenario3_beta_mixed = sapply(1:1000, function(rep) {
   compute.jaccard(ACAT.by.element(spearman.cor.Scenario_3_beta_mixed[[rep]], list.scenarios.dense.random.Microbiotes$Scenario_3_beta_random[[rep]],list.scenarios.dense.random.Metabolites$Scenario_3_beta_random[[rep]]),
-                  list.scenarios.dense.random.index$Scenario_3_beta_random[[rep]]$Microbiotes)
+                  list.scenarios.dense.random.index$Scenario_3_beta_random[[rep]]$Microbiotes, 0.05/25)
 })
 
 boxplot(jaccard.Scenario3_beta_neg0.5,jaccard.Scenario3_beta_neg0.25,jaccard.Scenario3_beta_0.25,jaccard.Scenario3_beta_0.5,jaccard.Scenario3_beta_mixed,
-        names=c("Neg 0.5", "Neg 0.25", "0.25", "0.5", "Mixed"), horizontal=F)
-
-
-#Confusion Matrix:
+        names=c("Neg 0.5", "Neg 0.25", "0.25", "0.5", "Mixed"), horizontal=F, main="Jaccard Index for Scenarios with 3 associated elements at different association strenghts (alpha=0.05/25)", xlab="Association Strengths", ylab="Jaccard Index")
 
 
 #We can do the same now comparing different number of associated elements for the same level of association
@@ -73,16 +72,16 @@ spearman.cor.Scenario_10_beta_mixed = lapply(1:1000, function(rep) {
 
 jaccard.Scenario1_beta_mixed = sapply(1:1000, function(rep) {
   compute.jaccard(ACAT.by.element(spearman.cor.Scenario_1_beta_mixed[[rep]], list.scenarios.dense.random.Microbiotes$Scenario_1_beta_random[[rep]],list.scenarios.dense.random.Metabolites$Scenario_1_beta_random[[rep]]),
-                  list.scenarios.dense.random.index$Scenario_1_beta_random[[rep]]$Microbiotes)
+                  list.scenarios.dense.random.index$Scenario_1_beta_random[[rep]]$Microbiotes, 0.05/25)
 })
 
 jaccard.Scenario10_beta_mixed = sapply(1:1000, function(rep) {
   compute.jaccard(ACAT.by.element(spearman.cor.Scenario_10_beta_mixed[[rep]], list.scenarios.dense.random.Microbiotes$Scenario_10_beta_random[[rep]],list.scenarios.dense.random.Metabolites$Scenario_10_beta_random[[rep]]),
-                  list.scenarios.dense.random.index$Scenario_10_beta_random[[rep]]$Microbiotes)
+                  list.scenarios.dense.random.index$Scenario_10_beta_random[[rep]]$Microbiotes, 0.05/25)
 })
 
 
-boxplot(jaccard.Scenario1_beta_mixed,jaccard.Scenario3_beta_mixed,jaccard.Scenario10_beta_mixed, names=c(1,3,10))
+boxplot(jaccard.Scenario1_beta_mixed,jaccard.Scenario3_beta_mixed,jaccard.Scenario10_beta_mixed, names=c(1,3,10), main="Jaccard Index for Scenarios with mixed association strenghts (alpha=0.05/25)", xlab="#Associations", ylab="Jaccard Index")
 
 
 
@@ -102,10 +101,14 @@ pvalues.ACAT.Scenario1_beta_mixed = lapply(1:1000, function(rep){
 
 boxplot(sapply(1:1000, function(rep) f1.score(confusion.matrix(pvalues.ACAT.Scenario1_beta_mixed[[rep]], list.scenarios.dense.random.index$Scenario_1_beta_random[[rep]]$Microbiotes, c(1:25)[-list.scenarios.dense.random.index$Scenario_1_beta_random[[rep]]$Microbiotes], 0.002))),
         sapply(1:1000, function(rep) f1.score(confusion.matrix(pvalues.ACAT.Scenario3_beta_mixed[[rep]], list.scenarios.dense.random.index$Scenario_3_beta_random[[rep]]$Microbiotes, c(1:25)[-list.scenarios.dense.random.index$Scenario_3_beta_random[[rep]]$Microbiotes], 0.002))),
-        sapply(1:1000, function(rep) f1.score(confusion.matrix(pvalues.ACAT.Scenario10_beta_mixed[[rep]], list.scenarios.dense.random.index$Scenario_10_beta_random[[rep]]$Microbiotes, c(1:25)[-list.scenarios.dense.random.index$Scenario_10_beta_random[[rep]]$Microbiotes], 0.002))))
+        sapply(1:1000, function(rep) f1.score(confusion.matrix(pvalues.ACAT.Scenario10_beta_mixed[[rep]], list.scenarios.dense.random.index$Scenario_10_beta_random[[rep]]$Microbiotes, c(1:25)[-list.scenarios.dense.random.index$Scenario_10_beta_random[[rep]]$Microbiotes], 0.002))), ylim=c(0,1), names=c(1,3,10), ylab="F1 Score", xlab="#Associations", main="Jaccard Index for Scenarios with mixed association strenghts (alpha=0.05/25)")
 
 #If we are interested in constructing ROC curve.
+#Worst scenario
+par(mfrow=c(1,2))
 build.ROC(pvalues.ACAT.Scenario10_beta_mixed[[577]], list.scenarios.dense.random.index$Scenario_10_beta_random[[577]]$Microbiotes, c(1:25)[-list.scenarios.dense.random.index$Scenario_10_beta_random[[577]]$Microbiotes])
+build.ROC(pvalues.ACAT.Scenario10_beta_mixed[[198]], list.scenarios.dense.random.index$Scenario_10_beta_random[[198]]$Microbiotes, c(1:25)[-list.scenarios.dense.random.index$Scenario_10_beta_random[[198]]$Microbiotes])
+par(mfrow=c(1,1))
 
 #Compute AUC
 auc.Scenario10_beta_mixed = sapply(1:1000, function(x) compute.auc(pvalues.ACAT.Scenario10_beta_mixed[[x]],list.scenarios.dense.random.index$Scenario_10_beta_random[[x]]$Microbiotes))
@@ -113,7 +116,7 @@ auc.Scenario3_beta_mixed = sapply(1:1000, function(x) compute.auc(pvalues.ACAT.S
 auc.Scenario1_beta_mixed = sapply(1:1000, function(x) compute.auc(pvalues.ACAT.Scenario1_beta_mixed[[x]],list.scenarios.dense.random.index$Scenario_1_beta_random[[x]]$Microbiotes))
 
 
-boxplot(auc.Scenario1_beta_mixed,auc.Scenario3_beta_mixed,auc.Scenario10_beta_mixed)
+boxplot(auc.Scenario1_beta_mixed,auc.Scenario3_beta_mixed,auc.Scenario10_beta_mixed, ylab="AUC", xlab="#Associations",names=c(1,3,10), main="AUC for Scenarios with mixed association strenghts")
 
 #Comparisons with other association levels:
 pvalues.ACAT.Scenario3_beta_neg0.5 = lapply(1:1000, function(rep){
@@ -141,13 +144,14 @@ boxplot(auc.Scenario3_beta_neg0.5,
         auc.Scenario3_beta_neg0.25,
         auc.Scenario3_beta_0.25,
         auc.Scenario3_beta_0.5,
-        auc.Scenario3_beta_mixed)
+        auc.Scenario3_beta_mixed, ylim=c(0,1), ylab="AUC", xlab="Association Strenghts",names=c("Neg 0.5", "Neg 0.25", "0.25", "0.5", "Mixed"), main="AUC for Scenarios with 3 associated elements at different association strenghts")
 
 jaccard.associations.Scenario1_beta_mixed = sapply(1:1000, function(rep) find.true.associations(spearman.cor.Scenario_1_beta_mixed[[rep]], 0.05/25, list.scenarios.dense.random.index$Scenario_1_beta_random[[rep]]$Microbiotes,list.scenarios.dense.random.index$Scenario_1_beta_random[[rep]]$Metabolites))
 jaccard.associations.Scenario3_beta_mixed = sapply(1:1000, function(rep) find.true.associations(spearman.cor.Scenario_3_beta_mixed[[rep]], 0.05/25, list.scenarios.dense.random.index$Scenario_3_beta_random[[rep]]$Microbiotes,list.scenarios.dense.random.index$Scenario_3_beta_random[[rep]]$Metabolites))
 jaccard.associations.Scenario10_beta_mixed = sapply(1:1000, function(rep) find.true.associations(spearman.cor.Scenario_10_beta_mixed[[rep]], 0.05/25, list.scenarios.dense.random.index$Scenario_10_beta_random[[rep]]$Microbiotes,list.scenarios.dense.random.index$Scenario_10_beta_random[[rep]]$Metabolites))
 
-boxplot(jaccard.associations.Scenario1_beta_mixed,jaccard.associations.Scenario3_beta_mixed,jaccard.associations.Scenario10_beta_mixed, names=c(1,3,10))
+boxplot(jaccard.associations.Scenario1_beta_mixed,jaccard.associations.Scenario3_beta_mixed,jaccard.associations.Scenario10_beta_mixed, names=c(1,3,10), ylim=c(0,1), main="Jaccard Index at pair levels for Scenarios with mixed association strenghts (alpha=0.05/25)",
+        xlab="#Associations", ylab="Jaccard Index")
 
 jaccard.associations.Scenario3_beta_neg0.5 = sapply(1:1000, function(rep) find.true.associations(spearman.cor.Scenario_3_beta_neg0.5[[rep]], 0.05/25, list.scenarios.dense.index$`Scenario_3_beta_-0.5`[[rep]]$Microbiotes,list.scenarios.dense.index$`Scenario_3_beta_-0.5`[[rep]]$Metabolites))
 jaccard.associations.Scenario3_beta_neg0.25 = sapply(1:1000, function(rep) find.true.associations(spearman.cor.Scenario_3_beta_neg0.25[[rep]], 0.05/25, list.scenarios.dense.index$`Scenario_3_beta_-0.25`[[rep]]$Microbiotes,list.scenarios.dense.index$`Scenario_3_beta_-0.25`[[rep]]$Metabolites))
@@ -155,7 +159,9 @@ jaccard.associations.Scenario3_beta_0.25 = sapply(1:1000, function(rep) find.tru
 jaccard.associations.Scenario3_beta_0.5 = sapply(1:1000, function(rep) find.true.associations(spearman.cor.Scenario_3_beta_0.5[[rep]], 0.05/25, list.scenarios.dense.index$Scenario_3_beta_0.5[[rep]]$Microbiotes,list.scenarios.dense.index$Scenario_3_beta_0.5[[rep]]$Metabolites))
 
 boxplot(jaccard.associations.Scenario3_beta_neg0.5,jaccard.associations.Scenario3_beta_neg0.25,
-        jaccard.associations.Scenario3_beta_0.25,jaccard.associations.Scenario3_beta_0.5,jaccard.associations.Scenario3_beta_mixed)
+        jaccard.associations.Scenario3_beta_0.25,jaccard.associations.Scenario3_beta_0.5,jaccard.associations.Scenario3_beta_mixed, ylim=c(0,1), 
+        main="Jaccard Index at pair levels for Scenarios with 3 associated at different association strenghts (alpha=0.05/25)",
+        xlab="Association Strenghts", ylab="Jaccard Index", names=c("Neg 0.5", "Neg 0.25", "0.25", "0.5", "Mixed"))
 
 summary(jaccard.associations.Scenario3_beta_0.25)
 
