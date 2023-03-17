@@ -51,7 +51,6 @@ redundancy.Scenario_3_beta_0.5 = lapply(1:1000, function(rep){
 redundancy.Scenario_3_beta_mixed = lapply(1:1000, function(rep){
   compute.redundancy.cca(list.scenarios.dense.random.Microbiotes$Scenario_3_beta_random[[rep]],list.scenarios.dense.random.Metabolites$Scenario_3_beta_random[[rep]],cca.Scenario_3_beta_mixed[[rep]])})
 
-
 redundancy.Scenario_1_beta_0.25 = lapply(1:1000, function(rep){
   compute.redundancy.cca(list.scenarios.dense.Microbiotes$Scenario_1_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_1_beta_0.25[[rep]],cca.Scenario_1_beta_0.25[[rep]])})
 
@@ -79,29 +78,28 @@ conditional.redundancy.X.Scenario_10_beta_0.25 = sapply(redundancy.Scenario_10_b
 conditional.redundancy.Y.Scenario_1_beta_0.25 = sapply(redundancy.Scenario_1_beta_0.25, function(x) sum(x$ConditionalRedundancy$Y))
 conditional.redundancy.Y.Scenario_10_beta_0.25 = sapply(redundancy.Scenario_10_beta_0.25, function(x) sum(x$ConditionalRedundancy$Y))
 
-par(mfrow=c(1,2))
-par(mar=c(1,1,1,1))
+
 boxplot(conditional.redundancy.X.Scenario_3_beta_neg0.5,
         conditional.redundancy.X.Scenario_3_beta_neg0.25,
         conditional.redundancy.X.Scenario_3_beta_0.25,
         conditional.redundancy.X.Scenario_3_beta_0.5,
-        conditional.redundancy.X.Scenario_3_beta_mixed, names=c(-0.5, -0.25, 0.25, 0.5, "Mixed"), ylim=c(0,0.5))
+        conditional.redundancy.X.Scenario_3_beta_mixed, names=c(-0.5, -0.25, 0.25, 0.5, "Mixed"), ylim=c(0,0.5), ylab="Conditional Redundancy", xlab="Association Strenghts", main="Conditional redundancy (Microbiotes) for different association strenghts with 3 associated elements")
 
 boxplot(conditional.redundancy.Y.Scenario_3_beta_neg0.5,
         conditional.redundancy.Y.Scenario_3_beta_neg0.25,
         conditional.redundancy.Y.Scenario_3_beta_0.25,
         conditional.redundancy.Y.Scenario_3_beta_0.5,
-        conditional.redundancy.Y.Scenario_3_beta_mixed, names=c(-0.5, -0.25, 0.25, 0.5, "Mixed"), ylim=c(0,0.5))
+        conditional.redundancy.Y.Scenario_3_beta_mixed, names=c(-0.5, -0.25, 0.25, 0.5, "Mixed"), ylim=c(0,0.5), ylab="Conditional Redundancy", xlab="Association Strenghts", main="Conditional redundancy (Metabolites) for different association strenghts with 3 associated elements")
 
 
 boxplot(conditional.redundancy.X.Scenario_1_beta_0.25,conditional.redundancy.X.Scenario_3_beta_0.25,
-        conditional.redundancy.X.Scenario_10_beta_0.25)
+        conditional.redundancy.X.Scenario_10_beta_0.25, ylim=c(0,0.5), xlab="#Associations", ylab="Conditional Redundancy", main="Conditional Redundancy (Microbiotes) with beta = 0.25 at different number of associated elements")
 
 boxplot(conditional.redundancy.Y.Scenario_1_beta_0.25,conditional.redundancy.Y.Scenario_3_beta_0.25,
-        conditional.redundancy.Y.Scenario_10_beta_0.25, ylim=c(0,1))
+        conditional.redundancy.Y.Scenario_10_beta_0.25, ylim=c(0,0.5), xlab="#Associations", ylab="Conditional Redundancy", main="Conditional Redundancy (Metabolites) with beta = 0.25 at different number of associated elements")
+
 
 #PLS: regression
-
 pls.regression.Scenario_3_beta_0.25 = lapply(1:1000, function(rep){
   mixOmics::pls(list.scenarios.dense.Microbiotes$Scenario_3_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_3_beta_0.25[[rep]], ncomp=25, mode="regression")
 })
@@ -141,6 +139,15 @@ redundancy.pls.Scenario10_beta_0.25 = lapply(1:1000, function(rep) {
   compute.redundancy.pls(list.scenarios.dense.Microbiotes$Scenario_10_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_10_beta_0.25[[rep]],pls.regression.Scenario_10_beta_0.25[[rep]])
 })
 
+redundancy.pls.canonical_Scenario1_beta_0.25 = lapply(1:1000, function(rep){
+  compute.redundancy.pls(list.scenarios.dense.Microbiotes$Scenario_1_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_1_beta_0.25[[rep]],pls.canonical.Scenario_1_beta_0.25[[rep]])
+})
+redundancy.pls.canonical_Scenario3_beta_0.25 = lapply(1:1000, function(rep){
+  compute.redundancy.pls(list.scenarios.dense.Microbiotes$Scenario_3_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_3_beta_0.25[[rep]],pls.canonical.Scenario_3_beta_0.25[[rep]])
+})
+redundancy.pls.canonical_Scenario10_beta_0.25 = lapply(1:1000, function(rep){
+  compute.redundancy.pls(list.scenarios.dense.Microbiotes$Scenario_10_beta_0.25[[rep]],list.scenarios.dense.Metabolites$Scenario_10_beta_0.25[[rep]],pls.canonical.Scenario_10_beta_0.25[[rep]])
+})
 
 conditional.redundancy.pls.X.Scenario_1_beta_0.25 = sapply(redundancy.pls.Scenario1_beta_0.25, function(x) sum(x$ConditionalRedundancy$X))
 conditional.redundancy.pls.X.Scenario_3_beta_0.25 = sapply(redundancy.pls.Scenario3_beta_0.25, function(x) sum(x$ConditionalRedundancy$X))
@@ -151,8 +158,13 @@ conditional.redundancy.pls.Y.Scenario_3_beta_0.25 = sapply(redundancy.pls.Scenar
 conditional.redundancy.pls.Y.Scenario_10_beta_0.25 = sapply(redundancy.pls.Scenario10_beta_0.25, function(x) sum(x$ConditionalRedundancy$Y))
 
 
+conditional.redundancy.pls.canonical.Y.Scenario_1_beta_0.25 = sapply(redundancy.pls.canonical_Scenario1_beta_0.25, function(x) sum(x$ConditionalRedundancy$Y))
+conditional.redundancy.pls.canonical.Y.Scenario_3_beta_0.25 = sapply(redundancy.pls.canonical_Scenario3_beta_0.25, function(x) sum(x$ConditionalRedundancy$Y))
+conditional.redundancy.pls.canonical.Y.Scenario_10_beta_0.25 = sapply(redundancy.pls.canonical_Scenario10_beta_0.25, function(x) sum(x$ConditionalRedundancy$Y))
+
+par(mfrow=c(1,1))
 boxplot(conditional.redundancy.pls.X.Scenario_1_beta_0.25,conditional.redundancy.pls.X.Scenario_3_beta_0.25,
-        conditional.redundancy.pls.X.Scenario_10_beta_0.25)
+        conditional.redundancy.pls.X.Scenario_10_beta_0.25, ylim=c(0,1))
 
 boxplot(conditional.redundancy.pls.Y.Scenario_1_beta_0.25,conditional.redundancy.pls.Y.Scenario_3_beta_0.25,
         conditional.redundancy.pls.Y.Scenario_10_beta_0.25, ylim=c(0,1))
@@ -174,6 +186,29 @@ sapply(1:1000, function(rep) compute.explained.variance.rda(rda.Scenario_3_beta_
 sapply(1:1000, function(rep) compute.explained.variance.rda(rda.Scenario_10_beta_0.25[[rep]])), ylim=c(0,1))
 
 
+#Method comparison with respect to conditional redundancy 
+
+list.redundancy.Y.all.methods.Scenario_3_beta_0.25 = list("CCA"=conditional.redundancy.Y.Scenario_3_beta_0.25,
+                                                          "PLS_Canonical"=conditional.redundancy.pls.canonical.Y.Scenario_3_beta_0.25,
+                                                          "PLS_Regression"=conditional.redundancy.pls.Y.Scenario_3_beta_0.25,
+                                                          "RDA"= sapply(1:1000, function(rep) compute.explained.variance.rda(rda.Scenario_3_beta_0.25[[rep]])))
+
+
+#If we are interested in assessing statistical significance between method performance
+p.comp.methods = combn(1:4,2,simplify = T)
+
+lapply(1:ncol(p.comp.methods) , function(c) t.test(list.redundancy.Y.all.methods.Scenario_3_beta_0.25[p.comp.methods[,c]][[1]],
+       list.redundancy.Y.all.methods.Scenario_3_beta_0.25[p.comp.methods[,c]][[2]]))
+
+par(mfrow=c(1,3))
+boxplot(conditional.redundancy.Y.Scenario_1_beta_0.25,conditional.redundancy.pls.canonical.Y.Scenario_1_beta_0.25,conditional.redundancy.pls.Y.Scenario_1_beta_0.25,
+        sapply(1:1000, function(rep) compute.explained.variance.rda(rda.Scenario_1_beta_0.25[[rep]])), ylim=c(0,1), ylab="Conditional Redundancy", xlab="Methods", names=c("CCA", "PLS Can", "PLS Reg", "RDA"))
+boxplot(conditional.redundancy.Y.Scenario_3_beta_0.25,conditional.redundancy.pls.canonical.Y.Scenario_3_beta_0.25,conditional.redundancy.pls.Y.Scenario_3_beta_0.25,
+        sapply(1:1000, function(rep) compute.explained.variance.rda(rda.Scenario_3_beta_0.25[[rep]])), ylim=c(0,1), xlab="Methods", main="Conditional Redundancy for [1,3,10] associated elements \n and beta = 0.25", names=c("CCA", "PLS Can", "PLS Reg", "RDA"))
+boxplot(conditional.redundancy.Y.Scenario_10_beta_0.25,conditional.redundancy.pls.canonical.Y.Scenario_10_beta_0.25,conditional.redundancy.pls.Y.Scenario_10_beta_0.25,
+        sapply(1:1000, function(rep) compute.explained.variance.rda(rda.Scenario_10_beta_0.25[[rep]])), ylim=c(0,1), xlab="Methods", names=c("CCA", "PLS Can", "PLS Reg", "RDA"))
+
+summary(conditional.redundancy.pls.canonical.Y.Scenario_10_beta_0.25)
 
 trw.X = sapply(1:1000, function(rep) {
   compute.jaccard.pls(pls.regression.Scenario_10_beta_0.25[[rep]],

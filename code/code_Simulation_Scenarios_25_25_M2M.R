@@ -3,7 +3,7 @@ list.Scenarios_25_25_M2M_Microbiotes = list()
 list.Scenarios_25_25_M2M_Metabolites = list()
 list.Scenarios_25_25_M2M_effects = list()
 
-for(rep in 1:100){
+for(rep in 1:1000){
   print(rep)
   L0 = matrix(0, ncol=25, nrow=25)
   #Variance for microbiotes throughout samples
@@ -93,14 +93,3 @@ for(rep in 1:100){
   
 }
 
-summary(pscl::zeroinfl(list.Scenarios_25_25_M2M_Metabolites[[1]][,3]~list.Scenarios_25_25_M2M_Microbiotes[[1]][,25]+list.Scenarios_25_25_M2M_Microbiotes[[1]][,13]+list.Scenarios_25_25_M2M_Microbiotes[[1]][,21],dist = "negbin"))
-summary(pscl::zeroinfl(list.Scenarios_25_25_M2M_Microbiotes[[1]][,14]~list.Scenarios_25_25_M2M_Metabolites[[1]][,25]+
-                         list.Scenarios_25_25_M2M_Metabolites[[1]][,11]+list.Scenarios_25_25_M2M_Metabolites[[1]][,20]+list.Scenarios_25_25_M2M_Metabolites[[1]][,22],dist = "negbin"))
-
-cc.test = CCA::cc(list.Scenarios_25_25_M2M_Metabolites[[24]], list.Scenarios_25_25_M2M_Microbiotes[[24]])
-
-redundancy.test = compute.redundancy.cca(list.Scenarios_25_25_M2M_Metabolites[[24]], list.Scenarios_25_25_M2M_Microbiotes[[24]],
-                       cc.test)
-
-
-sum(redundancy.test$ConditionalRedundancy$X)

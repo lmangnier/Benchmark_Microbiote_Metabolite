@@ -175,7 +175,7 @@ zinb.Scenario3_beta_0.25 = list()
 zinb.Scenario3_beta_0.5 = list()
 zinb.Scenario3_beta_mixed = list()
 
-for(r in 1:1000){
+for(r in 1:100){
   print(r)
   l = list()
   for(j in 1:25){
@@ -183,15 +183,18 @@ for(r in 1:1000){
     p = c()
     for(i in 1:25){
       
-      m = summary(zeroinfl(list.scenarios.dense.Metabolites$Scenario_3_beta_0.25[[r]][,j]~list.scenarios.dense.Microbiotes$Scenario_3_beta_0.25[[r]][,i], dist="negbin"))
+      m = summary(zeroinfl(list.scenarios.dense.Metabolites$Scenario_3_beta_0.5[[r]][,j]~list.scenarios.dense.Microbiotes$Scenario_3_beta_0.5[[r]][,i], dist="negbin"))
       p = c(p,m$coefficients$count[2,4])
     }
     l[[j]] = p
-    zinb.Scenario3_beta_0.25[[r]] = l
+    zinb.Scenario3_beta_0.5[[r]] = l
     
   }
   
 }
+
+
+zinb.Scenario3_beta_0.5[[10]]
 
 #LASSO-ZINB
 list.results.lasso.Scenario_3_beta_0.25 = list()
