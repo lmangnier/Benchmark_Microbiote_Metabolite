@@ -6,13 +6,13 @@ load("util_functions.R")
 
 #Correlation approaches:
 #Spearman correlation
-list.scenarios.dense.Microbiotes = readRDS("../data_scenarios_denses_fixed_Microbiotes.RDS")
-list.scenarios.dense.Metabolites = readRDS("../data_scenarios_denses_fixed_Metabolites.RDS")
-list.scenarios.dense.index = readRDS("../data_scenarios_denses_fixed_index.RDS")
+list.scenarios.dense.Microbiotes = readRDS("data/data_scenarios_denses_fixed_Microbiotes.RDS")
+list.scenarios.dense.Metabolites = readRDS("data/data_scenarios_denses_fixed_Metabolites.RDS")
+list.scenarios.dense.index = readRDS("data/data_scenarios_denses_fixed_index.RDS")
 
-list.scenarios.dense.random.Microbiotes = readRDS("../data_scenarios_denses_random_Microbiotes.RDS")
-list.scenarios.dense.random.Metabolites = readRDS("../data_scenarios_denses_random_Metabolites.RDS")
-list.scenarios.dense.random.index = readRDS("../data_scenarios_denses_random_index.RDS")
+list.scenarios.dense.random.Microbiotes = readRDS("data/data_scenarios_denses_random_Microbiotes.RDS")
+list.scenarios.dense.random.Metabolites = readRDS("data/data_scenarios_denses_random_Metabolites.RDS")
+list.scenarios.dense.random.index = readRDS("data/data_scenarios_denses_random_index.RDS")
 
 #For a same number of associated elements (3 microbiotes associated with 3 metabolites)
 #Beta=-0.5
@@ -166,7 +166,7 @@ boxplot(jaccard.associations.Scenario3_beta_neg0.5,jaccard.associations.Scenario
 summary(jaccard.associations.Scenario3_beta_0.25)
 
 #Regression approaches:
-#Here we use ZINB approach:
+#Here we use ZINB approach (100 replicates):
 library(pscl)
 
 zinb.Scenario3_beta_neg0.5 = list()
@@ -183,31 +183,54 @@ for(r in 1:100){
     p = c()
     for(i in 1:25){
       
-      m = summary(zeroinfl(list.scenarios.dense.Metabolites$Scenario_3_beta_0.5[[r]][,j]~list.scenarios.dense.Microbiotes$Scenario_3_beta_0.5[[r]][,i], dist="negbin"))
+      m = summary(zeroinfl(list.scenarios.dense.Metabolites$`Scenario_3_beta_-0.5`[[r]][,j]~list.scenarios.dense.Microbiotes$`Scenario_3_beta_-0.5`[[r]][,i], dist="negbin"))
       p = c(p,m$coefficients$count[2,4])
     }
     l[[j]] = p
-    zinb.Scenario3_beta_0.5[[r]] = l
+    zinb.Scenario3_beta_neg0.5[[r]] = l
     
   }
   
 }
 
-
+zinb.Scenario3_beta_neg0.5[[10]]
+zinb.Scenario3_beta_neg0.25[[10]]
+zinb.Scenario3_beta_0.25[[10]]
 zinb.Scenario3_beta_0.5[[10]]
+zinb.Scenario3_beta_mixed[[10]]
 
-#LASSO-ZINB
+#LASSO-ZINB (100 replicates)
+list.results.lasso.Scenario_1_beta_0.25 = list()
 list.results.lasso.Scenario_3_beta_0.25 = list()
+list.results.lasso.Scenario_10_beta_0.25 = list()
 
-for(y in 1:25){
-  Xy = data.frame(cbind(list.scenarios.dense.Metabolites$Scenario_3_beta_0.25[[1]][,y], list.scenarios.dense.Microbiotes$Scenario_3_beta_0.25[[1]]))
+for(rep in 25:26){
+  print(rep)
+  X = list.scenarios.dense.Microbiotes$Scenario_3_beta_0.25[[rep]]
   
+  l = list()
+  for(y in 1:25){
+    Xy = data.frame(cbind(list.scenarios.dense.Metabolites$Scenario_3_beta_0.25[[rep]][,y], X))
+    fit.lasso.NB = mpath::glmregNB(X1~.,data=Xy, penalty="enet", rescale=FALSE, parallel = T)
+    
+    
+    # fit.lasso = mpath::zipath(X1~.|.,data=Xy,family = "negbin", nlambda=100,
+    #                           lambda.zero.min.ratio=0.001, maxit.em=300, maxit.theta=25,
+    #                           theta.fixed=FALSE, trace=FALSE, penalty="enet", rescale=FALSE)
+    # 
+    
+    #Each model are selected based on BIC
+    minBic = which.min(BIC(fit.lasso.NB))
+    
+    l[[y]] = coef(fit.lasso.NB, minBic)
+  }
   
-  fit.lasso = mpath::zipath(X1~.|.,data=Xy,family = "negbin", nlambda=100,
-                            lambda.zero.min.ratio=0.001, maxit.em=300, maxit.theta=25,
-                            theta.fixed=FALSE, trace=FALSE, penalty="enet", rescale=FALSE)
-  
-  minBic = which.min(BIC(fit.lasso))
-  list.results.lasso.Scenario_3_beta_0.25[[y]] = coef(fit.lasso, minBic)
+  list.results.lasso.Scenario_3_beta_0.25[[rep]] = l
 }
+
+list.results.lasso.Scenario_3_beta_0.25[[26]]
+find.true.associations.lasso(list.results.lasso.Scenario_3_beta_0.25[[3]], list.scenarios.dense.index$Scenario_3_beta_0.25[[3]]$Microbiotes,list.scenarios.dense.index$Scenario_3_beta_0.25[[3]]$Metabolites )
+
+
+
 

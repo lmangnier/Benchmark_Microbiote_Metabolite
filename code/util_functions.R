@@ -175,10 +175,42 @@ compute.auc = function(pvalues,true.associated){
 }
 
 #Lasso-ZINB 
+find.true.associations.lasso = function(lasso.output, index.X, index.Y){
+  
+  names(lasso.output) = 1:length(lasso.output)
+  non.null.coeffs.lasso = lapply(lasso.output, function(x) which(x[-1]!=0))
+  non.null.coeffs.lasso = non.null.coeffs.lasso[which(sapply(non.null.coeffs.lasso, length)>0)]
+  
+  pairs = list()
+  
+  for(i in 1:length(index.Y)){
+    a = c(index.Y[i],
+          index.X[i])
+    pairs[[i]] = a
+  }
+  
+  
+  l=c()
+  
+  for(i in names(non.null.coeffs.lasso)){
+    u = c()
+    for(j in non.null.coeffs.lasso[[i]]){
+      c = c(i,j)
+      n = c()
+      for(p in 1:length(index.Y)){
+        n = c(n,all(c  == pairs[[p]]))
+      }
+      
+      u = c(u,sum(n))
+    }
+    l = c(l,sum(n))
+  }
+  
+  sum(l)/(length(index.Y)+length(l)-sum(l))
+}
 
 
 #CCA
-
 #This function returns different types of redundancy from a CCA object
 #'@param X a data.frame
 #'@param Y a data.frame
